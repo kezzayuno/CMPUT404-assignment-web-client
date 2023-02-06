@@ -20,7 +20,6 @@
 
 import sys
 import socket
-import re
 
 import urllib.parse
 
@@ -86,18 +85,17 @@ class HTTPClient(object):
                 done = not part
         return buffer.decode('utf-8')
 
-    def GET(self, url, args=None):
-        host, port, path = urllib.parse.urlparse(url).hostname, urllib.parse.urlparse(url).port, urllib.parse.urlparse(url).path
-        
+    def check_path_port(self, path, port):
         if path == "": 
             path = "/"
         if port == None: 
             port = 80
+        return path, port
+    
+    def send_message(self, data):
+        self.connect(data[2], data[-1])
 
-        self.connect(host, port)
-
-        to_send = self.get_headers(["GET", path, host, args])
-        print(to_send)
+        to_send = self.get_headers([data[0], data[1], data[2], data[3]])
 
         self.sendall(to_send)
 
@@ -105,6 +103,14 @@ class HTTPClient(object):
         response = response.split("\r\n")
 
         self.close()
+        return response
+
+    def GET(self, url, args=None):
+        host, port, path = urllib.parse.urlparse(url).hostname, urllib.parse.urlparse(url).port, urllib.parse.urlparse(url).path
+        
+        path, port = self.check_path_port(path, port)
+
+        response = self.send_message(["GET", path, host, args, port])
 
         code = int(self.get_code(response))
         body = self.get_body(response)
@@ -113,21 +119,9 @@ class HTTPClient(object):
     def POST(self, url, args=None):
         host, port, path = urllib.parse.urlparse(url).hostname, urllib.parse.urlparse(url).port, urllib.parse.urlparse(url).path
 
-        if path == "": 
-            path = "/"
-        if port == None: 
-            port = 80
+        path, port = self.check_path_port(path, port)
         
-        self.connect(host, port)
-
-        to_send = self.get_headers(["POST", path, host, args])
-
-        self.sendall(to_send)
-
-        response = self.recvall(self.socket)
-        response = response.split("\r\n")
-
-        self.close()
+        response = self.send_message(["POST", path, host, args, port])
 
         code = int(self.get_code(response))
         body = self.get_body(response)
