@@ -144,6 +144,6 @@ if __name__ == "__main__":
     elif (len(sys.argv) == 3):
         print(client.command( sys.argv[2], sys.argv[1] ))
     elif (len(sys.argv) > 3): # passing in vars 
-        print(client.command( sys.argv[2], sys.argv[1], sys.argv[2]))
+        print(client.command( sys.argv[2], sys.argv[1], eval(sys.argv[3])))
     else:
         print(client.command( sys.argv[1] ))
