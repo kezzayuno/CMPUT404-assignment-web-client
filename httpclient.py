@@ -21,7 +21,7 @@
 import sys
 import socket
 import re
-# you may use urllib to encode data appropriately
+
 import urllib.parse
 
 def help():
@@ -33,7 +33,6 @@ class HTTPResponse(object):
         self.body = body
 
 class HTTPClient(object):
-    #def get_host_port(self,url):
 
     def connect(self, host, port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -46,15 +45,17 @@ class HTTPClient(object):
     def get_headers(self,data):
         if data[0] == "GET":
             headers = "GET " + data[1] + " HTTP/1.1\r\n" + "Host: " + data[2] + "\r\n" + "Connection: close\r\n"
-            if data[3] != None:
-                headers += str(urllib.parse.urlencode(data[3])) + "\r\n\r\n"
+            if data[3]:
+                arguments = urllib.parse.urlencode(data[3])
+                headers += str(arguments) + "\r\n\r\n"
             else: 
                 headers += "\r\n"
         elif data[0] == "POST":
             headers = "POST " + data[1] + " HTTP/1.1\r\n" + "Host: " + data[2] \
             + "\r\nContent-Type: application/x-www-form-urlencoded\r\nConnection: close\r\nContent-Length: " 
-            if data[3] != None: 
-                headers += str(len(urllib.parse.urlencode(data[3]))) + "\r\n\r\n" + str(urllib.parse.urlencode(data[3]))
+            if data[3]: 
+                arguments = urllib.parse.urlencode(data[3])
+                headers += str(len(arguments)) + "\r\n\r\n" + str(arguments)
             else: 
                 headers += "0\r\n\r\n"
         
