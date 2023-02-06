@@ -111,6 +111,7 @@ class HTTPClient(object):
         path, port = self.check_path_port(path, port)
 
         response = self.send_message(["GET", path, host, args, port])
+        print(response)
 
         code = int(self.get_code(response))
         body = self.get_body(response)
@@ -122,6 +123,7 @@ class HTTPClient(object):
         path, port = self.check_path_port(path, port)
         
         response = self.send_message(["POST", path, host, args, port])
+        print(response)
 
         code = int(self.get_code(response))
         body = self.get_body(response)
@@ -141,5 +143,7 @@ if __name__ == "__main__":
         sys.exit(1)
     elif (len(sys.argv) == 3):
         print(client.command( sys.argv[2], sys.argv[1] ))
+    elif (len(sys.argv) > 3): # passing in vars 
+        print(client.command( sys.argv[2], sys.argv[1], sys.argv[2]))
     else:
         print(client.command( sys.argv[1] ))
